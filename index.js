@@ -3,6 +3,19 @@ const app = express();
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 
+const morgan = require('morgan');
+
+morgan.token('data', function(req) {
+    if (req.method === 'DELETE') {
+      return JSON.stringify(req.params)
+    } else if (req.method === 'POST') {
+      return JSON.stringify(req.body)
+    }
+    return
+  })
+
+app.use(morgan(':method :url :status :response-time ms :data'))
+
 let persons = [
     { 
         "name": "Arto Hellas", 
