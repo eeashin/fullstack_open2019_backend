@@ -101,6 +101,8 @@ app.get('/api/persons/:id', (request, response) => {
     }
   })
 
-const port = 3001;
-app.listen(port);
-console.log(`Server running on port ${port}`);
+const port = process.event.PORT || 3001;
+app.listen(PORT,()=>{
+  console.log(`Server running on port ${port}`);
+});
+
