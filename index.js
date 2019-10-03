@@ -7,6 +7,8 @@ app.use(cors())
 
 const morgan = require('morgan');
 
+app.use(express.static('build'))
+
 morgan.token('data', function(req) {
     if (req.method === 'DELETE') {
       return JSON.stringify(req.params)
