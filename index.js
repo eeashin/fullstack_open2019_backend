@@ -9,7 +9,7 @@ const morgan = require("morgan");
 app.use(express.static("build"));
 app.use(bodyParser.json());
 
-morgan.token("data", function(req) {
+morgan.token("data", function (req) {
   if (req.method === "DELETE") {
     return JSON.stringify(req.params);
   } else if (req.method === "POST") {
@@ -70,30 +70,30 @@ app.get("/info", (req, res) => {
 });
 
 app.get("/api/persons", (req, res) => {
-  Person.find({}).then(persons =>{
+  Person.find({}).then(persons => {
     res.json(persons.map(person => person.toJSON()))
   })
 });
 
 app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id)
-  .then(person => {
-    if(person) {
-      response.json(person.toJSON())
-    }else{
-      response.status(404).end() 
-    }
-    
-  })
-  .catch(error => next(error))
+    .then(person => {
+      if (person) {
+        response.json(person.toJSON())
+      } else {
+        response.status(404).end()
+      }
+
+    })
+    .catch(error => next(error))
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
-  .then(result => {
-    response.status(204).end()
-  })
-  .catch(error => next(error))
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 });
 
 const generateId = () => {
@@ -115,8 +115,7 @@ app.post("/api/persons", (request, response, next) => {
   } else if (
     persons
       .map(person => person.name.toLowerCase())
-      .indexOf(body.name.toLowerCase()) > -1 ===true)
-      {
+      .indexOf(body.name.toLowerCase()) > -1 === true) {
     return response.status(400).json({
       error: "Name must be unique"
     });
@@ -127,10 +126,10 @@ app.post("/api/persons", (request, response, next) => {
       id: generateId()
     });
 
-   person.save().then(savedPerson => savedPerson.toJSON())
-   .then(savedAndFormattedPerson => {
-    response.json(savedAndFormattedPerson)
-   }).catch(error => next(error))
+    person.save().then(savedPerson => savedPerson.toJSON())
+      .then(savedAndFormattedPerson => {
+        response.json(savedAndFormattedPerson)
+      }).catch(error => next(error))
   }
 });
 
