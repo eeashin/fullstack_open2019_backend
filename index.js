@@ -3,11 +3,11 @@ const express = require("express");
 const Person = require('./models/person')
 const app = express();
 const bodyParser = require("body-parser");
-app.use(bodyParser.json());
 const cors = require("cors");
 app.use(cors());
 const morgan = require("morgan");
 app.use(express.static("build"));
+app.use(bodyParser.json());
 
 morgan.token("data", function(req) {
   if (req.method === "DELETE") {
@@ -20,7 +20,23 @@ morgan.token("data", function(req) {
 
 app.use(morgan(":method :url :status :response-time ms :data"));
 
+// const errorHandler = (error, request, response, next) => {
+//   console.error(error.message)
 
+//   if (error.name === 'CastError' && error.kind === 'ObjectId') {
+//     return response.status(400).send({ error: 'malformatted id' })
+//   } 
+
+//   next(error)
+// }
+
+// app.use(errorHandler)
+
+// const unknownEndpoint = (request, response) => {
+//   response.status(404).send({ error: 'unknown endpoint' })
+// }
+// // handler of requests with unknown endpoint
+// app.use(unknownEndpoint)
 
 let persons = [
   {
@@ -57,20 +73,25 @@ app.get("/api/persons", (req, res) => {
   })
 });
 
-app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find(person => person.id === id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+  .then(person => {
+    if(person) {
+      response.json(person.toJSON())
+    }else{
+      response.status(404).end() 
+    }
+    
+  })
+  .catch(error => next(error))
 });
 
-app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter(person => person.id !== id);
-  response.status(204).end();
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+  .then(result => {
+    response.status(204).end()
+  })
+  .catch(error => next(error))
 });
 
 const generateId = () => {
